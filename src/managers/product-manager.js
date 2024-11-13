@@ -1,4 +1,5 @@
 import ProductModel from "../models/product.model.js";
+import mongoose from "mongoose";
 
 //MODIFICACION: Cambié la estructura para adaptarse a MongoDB en lugar de archivos JSON.
 export class ProductManager {
@@ -59,7 +60,7 @@ export class ProductManager {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw new Error("ID no válido");
         }
-        
+
       const deletedProduct = await ProductModel.findByIdAndDelete(id);
       if (!deletedProduct) {
         throw new Error("Producto no encontrado");

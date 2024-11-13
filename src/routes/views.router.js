@@ -74,8 +74,14 @@ router.get('/carts/:cid', async (req, res) => {
 router.get("/realtimeproducts", async (req, res) => {
     try {
         const productos = await productManager.getProducts();
-        console.log("Productos en carrito:", productos);
-        res.render("realtimeproducts", { productos });
+        // Mapear los productos para que el _id sea una cadena
+        const productosParseados = productos.docs.map(producto => {
+            return {
+                ...producto.toObject(),
+                _id: producto._id.toString() // Convertir el ObjectId a cadena
+            };
+        });
+        res.render("realtimeproducts", { productosParseados });
     } catch (error) {
         console.error("Error al obtener productos en tiempo real", error);
         res.status(500).json({ error: "Error interno del servidor" });

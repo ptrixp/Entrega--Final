@@ -54,6 +54,7 @@ io.on("connection", async (socket) => {
 
     //Eliminamos un producto:
     socket.on("eliminarProducto", async (id) => {
+        console.log("Eliminando producto en app con ID:", id); 
         await manager.deleteProduct(id); 
 
         //No se olviden! Enviar la lista actualizada de productos!

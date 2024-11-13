@@ -1,3 +1,7 @@
+<head>
+    <link rel="stylesheet" href="/css/product.css">
+</head>
+
 <h1>Mis productos</h1>
 
 <div class="contenedorCards">
@@ -11,12 +15,14 @@
 </div>
 
 
+<div class="pagination">
 {{#if hasPrevPage}}
     <a href="/products?page={{prevPage}}"> Anterior </a>
 {{/if}}
 
+<p>Pagina {{currentPage}} de {{totalPages}} </p>
 
 {{#if hasNextPage}}
     <a href="/products?page={{nextPage}}"> Siguiente </a>
 {{/if}} 
-<p>Pagina {{currentPage}} de {{totalPages}} </p>
+</div>

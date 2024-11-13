@@ -1,5 +1,5 @@
 import CartModel from "../models/cart.model.js";
-
+import mongoose from "mongoose";
 //MODIFICACION: Adaptado para MongoDB en lugar de archivos JSON.
 class CartManager {
   async crearCarrito() {

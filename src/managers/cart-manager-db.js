@@ -1,5 +1,5 @@
 import CartModel from "../models/cart.model.js";
-
+import mongoose from "mongoose";
 class CartManager {
     async crearCarrito() {
         try {

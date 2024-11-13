@@ -1,5 +1,5 @@
 import ProductModel from "../models/product.model.js";
-
+import mongoose from "mongoose";
 
 class ProductManager {
 
@@ -41,32 +41,46 @@ class ProductManager {
     async getProducts({ limit = 10, page = 1, sort, query } = {}) {
         try {
             const skip = (page - 1) * limit;
-
+    
             let queryOptions = {};
-
-            if (query) {
+    
+            // Validación de la categoría
+            if (query && typeof query === 'string' && query.trim() !== '') {
                 queryOptions = { category: query };
             }
-
+    
             const sortOptions = {};
-            if (sort) {
-                if (sort === 'asc' || sort === 'desc') {
-                    sortOptions.price = sort === 'asc' ? 1 : -1;
+    
+            // Verificar si 'sort' es un objeto (por ejemplo, { price: 1 } o { price: -1 })
+            if (sort && typeof sort === 'object' && !Array.isArray(sort)) {
+                // Si es un objeto, utilizamos su clave como el campo y el valor como la dirección de ordenación
+                for (const field in sort) {
+                    if (sort[field] === 1 || sort[field] === -1) {
+                        sortOptions[field] = sort[field]; // 'price': 1 o 'price': -1
+                    }
                 }
             }
-
+            // Verificar si 'sort' es un string ('asc' o 'desc') para ordenamiento por precio
+            else if (sort && (sort === 'asc' || sort === 'desc')) {
+                sortOptions.price = sort === 'asc' ? 1 : -1;
+            } else if (sort === undefined) {
+                console.log('El parámetro sort no se ha proporcionado. No se aplicará orden.');
+            } else {
+                console.log(`Valor de sort desconocido o incorrecto: ${JSON.stringify(sort)}. No se aplicará orden.`);
+            }
+    
             const productos = await ProductModel
                 .find(queryOptions)
-                .sort(sortOptions)
+                .sort(sortOptions)  // Aplicar el orden si es válido
                 .skip(skip)
                 .limit(limit);
-
+    
             const totalProducts = await ProductModel.countDocuments(queryOptions);
-
+    
             const totalPages = Math.ceil(totalProducts / limit);
             const hasPrevPage = page > 1;
             const hasNextPage = page < totalPages;
-
+    
             return {
                 docs: productos,
                 totalPages,
@@ -75,14 +89,18 @@ class ProductManager {
                 page,
                 hasPrevPage,
                 hasNextPage,
-                prevLink: hasPrevPage ? `/api/products?limit=${limit}&page=${page - 1}&sort=${sort}&query=${query}` : null,
-                nextLink: hasNextPage ? `/api/products?limit=${limit}&page=${page + 1}&sort=${sort}&query=${query}` : null,
+                prevLink: hasPrevPage ? `/api/products?limit=${limit}&page=${page - 1}&sort=${JSON.stringify(sort)}&query=${query}` : null,
+                nextLink: hasNextPage ? `/api/products?limit=${limit}&page=${page + 1}&sort=${JSON.stringify(sort)}&query=${query}` : null,
             };
         } catch (error) {
             console.log("Error al obtener los productos", error);
             throw error;
         }
     }
+    
+    
+    
+    
 
     async getProductById(id) {
         try {
